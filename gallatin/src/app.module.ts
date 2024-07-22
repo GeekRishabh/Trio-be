@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TasksModule } from './tasks/tasks.module';
+
+import { DatabaseConnection } from './database/database.connection';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    TasksModule,
+    MongooseModule.forRootAsync({
+      useClass: DatabaseConnection,
+    }),
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
