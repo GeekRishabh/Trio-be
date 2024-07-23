@@ -1,11 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   ClientProxy,
   ClientProxyFactory,
   Transport,
-  Client, ClientGrpc
 } from '@nestjs/microservices';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
@@ -13,27 +12,9 @@ import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
  * Service for managing tasks.
  */
 @Injectable()
-export class TasksService implements OnModuleInit{
+export class TasksService {
   private client: ClientProxy;
 
-
-  @Client({
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://guest:guest@localhost'],
-      queue: 'tasks_queue',
-      queueOptions: {
-        durable: false,
-      },
-    },
-})
-private rabbitmqClient: ClientGrpc;
-
-private rabbitmqService;
-
-onModuleInit() {
-    this.rabbitmqService = this.client.connect();
-}
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
@@ -41,10 +22,10 @@ onModuleInit() {
     this.client = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://guest:guest@localhost'],
+        urls: [process.env.RABBITMQ_URI],
         queue: 'tasks_queue',
         queueOptions: {
-          durable: false,
+          durable: true,
         },
       },
     });
