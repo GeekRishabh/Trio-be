@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AmqpConnection } from '@nestjs-plus/rabbitmq';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
-import { Task, TaskSchema } from './schemas/task.schema';
+import { Task } from './entities/task.entity';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
-  ],
+  imports: [TypeOrmModule.forFeature([Task])],
   providers: [TasksService, AmqpConnection],
   controllers: [TasksController],
 })

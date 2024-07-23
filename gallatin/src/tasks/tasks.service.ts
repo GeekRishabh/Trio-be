@@ -1,19 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { AmqpConnection } from '@nestjs-plus/rabbitmq';
-import { Model } from 'mongoose';
-import { CreateTaskDto } from './dto/task.dto';
-import { Task, TaskDocument } from './schemas/task.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  Transport,
+} from '@nestjs/microservices';
+import { Task } from './entities/task.entity';
+import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 
 /**
  * Service for managing tasks.
  */
 @Injectable()
 export class TasksService {
+  private client: ClientProxy;
   constructor(
-    @InjectModel(Task.name) private taskModel: Model<TaskDocument>,
-    private readonly amqpConnection: AmqpConnection,
-  ) {}
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+  ) {
+    this.client = ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: [process.env.RABBITMQ_URL],
+        queue: 'tasks_queue',
+        queueOptions: {
+          durable: false,
+        },
+      },
+    });
+  }
 
   /**
    * Creates a new task.
@@ -21,13 +37,27 @@ export class TasksService {
    * @returns The created task.
    */
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const task = new this.taskModel(createTaskDto);
-    await task.save();
+    const task = this.taskRepository.create(createTaskDto);
+    const savedTask = await this.taskRepository.save(task);
+    this.client.emit('task_created', savedTask);
+    return savedTask;
+  }
 
-    // Emit event to RabbitMQ
-    await this.amqpConnection.publish('task-exchange', 'task.created', task);
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    await this.taskRepository.update(id, updateTaskDto);
+    const updatedTask = await this.taskRepository.findOneBy({ id });
+    this.client.emit('task_updated', updatedTask);
+    return updatedTask;
+  }
 
-    return task;
+  /**
+   * Delete a task by ID.
+   * @param id The ID of the task.
+   * @returns void
+   */
+  async deleteTask(id: string): Promise<void> {
+    await this.taskRepository.delete(id);
+    this.client.emit('task_deleted', id);
   }
 
   /**
@@ -35,7 +65,7 @@ export class TasksService {
    * @returns An array of tasks.
    */
   async findAll(): Promise<Task[]> {
-    return this.taskModel.find().exec();
+    return this.taskRepository.find();
   }
 
   /**
@@ -44,6 +74,6 @@ export class TasksService {
    * @returns The task with the given ID.
    */
   async findOne(id: string): Promise<Task> {
-    return this.taskModel.findById(id).exec();
+    return this.taskRepository.findOneBy({ id });
   }
 }
