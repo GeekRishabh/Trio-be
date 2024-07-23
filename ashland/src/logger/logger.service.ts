@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ElasticsearchService } from '../elasticsearch/elasticsearch.service';
 
 /**
@@ -6,6 +6,7 @@ import { ElasticsearchService } from '../elasticsearch/elasticsearch.service';
  */
 @Injectable()
 export class LoggerService {
+  private readonly logger = new Logger(LoggerService.name);
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
   /**
@@ -13,7 +14,7 @@ export class LoggerService {
    * @param event The event data to log.
    */
   async logEvent(event: any) {
-    console.log('Event received:', event);
+    this.logger.log('Event received:', event);
     await this.elasticsearchService.indexLog('task-logs', event);
   }
 }
