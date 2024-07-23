@@ -1,5 +1,5 @@
-import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
-import { Client, ClientProxy, ClientGrpc, Transport } from '@nestjs/microservices';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { CreateTaskDto } from './dto/task.dto';
 
@@ -8,14 +8,12 @@ import { CreateTaskDto } from './dto/task.dto';
  */
 @Injectable()
 export class TasksService implements OnModuleInit {
-    constructor(@Inject('TASK_SERVICE') private readonly notificationService: ClientProxy) {}
-
     @Client({
         transport: Transport.GRPC,
         options: {
             package: 'task',
             protoPath: join(__dirname, './task.proto'),
-            url: 'localhost:3001'
+            url: process.env.GRPC_TASK_SERVICE_URL || 'localhost:3005'
         }
     })
     private client: ClientGrpc;

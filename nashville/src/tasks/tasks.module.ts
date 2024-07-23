@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AmqpConnection } from '@nestjs-plus/rabbitmq';
-import { ClientsModule, Transport, ClientProxyFactory } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
@@ -19,24 +18,7 @@ import { TasksController } from './tasks.controller';
             }
         ])
     ],
-    providers: [
-        TasksService,
-        AmqpConnection,
-
-        {
-            provide: 'TASK_SERVICE',
-            useFactory: async () => {
-                return ClientProxyFactory.create({
-                    options: {
-                        port: 3001,
-                        host: 'localhost'
-                    },
-                    transport: Transport.TCP
-                });
-            }
-        }
-    ],
-    controllers: [TasksController],
-    exports: ['TASK_SERVICE']
+    providers: [TasksService],
+    controllers: [TasksController]
 })
 export class TasksModule {}
