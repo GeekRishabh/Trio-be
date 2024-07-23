@@ -14,7 +14,7 @@ import { TasksController } from './tasks.controller';
                 options: {
                     package: 'task',
                     protoPath: join(__dirname, './task.proto'),
-                    url: 'localhost:3001'
+                    url: process.env.GRPC_TASK_SERVICE_URL
                 }
             }
         ])

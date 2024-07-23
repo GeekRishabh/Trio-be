@@ -11,7 +11,6 @@ service TaskService {
 }
 
 message CreateTaskRequest {
-  string title = 1;
   string description = 2;
   string status = 3;
 }
@@ -22,6 +21,7 @@ message FindOneTaskRequest {
 
 message TaskResponse {
   string id = 1;
+  string parentId = 5;
   string title = 2;
   string description = 3;
   string status = 4;
@@ -36,6 +36,7 @@ message Empty {}
 
 message UpdateOneTaskRequest{
   string id = 1;
+  string parentId = 5;
   string title = 2;
   string description = 3;
   string status = 4;
