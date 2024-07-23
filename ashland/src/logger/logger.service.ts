@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AmqpConnection } from '@nestjs-plus/rabbitmq';
 import { ElasticsearchService } from '../elasticsearch/elasticsearch.service';
-
 
 /**
  * Service for handling logging.
  */
 @Injectable()
 export class LoggerService {
-  constructor(
-    private readonly elasticsearchService: ElasticsearchService,
-    private readonly amqpConnection: AmqpConnection
-  ) {}
+  constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
   /**
    * Logs an event to the console and Elasticsearch.
