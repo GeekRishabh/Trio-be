@@ -9,8 +9,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const swaggerConfig = new DocumentBuilder()
-        .setTitle('Web API')
-        .setDescription('The Web API description')
+        .setTitle('Nashville Web API')
+        .setDescription('Nashville Web API description')
         .setVersion('1.0')
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
@@ -21,12 +21,12 @@ async function bootstrap() {
         options: {
             package: 'task',
             protoPath: join(__dirname, './tasks/task.proto'),
-            url: 'localhost:5000'
+            url: `${process.env.GRPC_TASK_SERVICE_URL}`
         }
     });
 
     // Start the microservice
     microserviceApp.listen();
-    await app.listen(3000);
+    await app.listen(process.env.SERVICE_PORT);
 }
 bootstrap();

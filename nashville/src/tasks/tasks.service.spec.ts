@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
-import { ClientGrpc } from '@nestjs/microservices';
 import { CreateTaskDto } from './dto/task.dto';
 
 /**
