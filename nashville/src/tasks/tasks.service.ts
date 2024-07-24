@@ -13,7 +13,7 @@ export class TasksService implements OnModuleInit {
         options: {
             package: 'task',
             protoPath: join(__dirname, './task.proto'),
-            url: process.env.GRPC_TASK_SERVICE_URL || 'localhost:3005'
+            url: process.env.GRPC_TASK_SERVICE_URL || 'localhost:3001'
         }
     })
     private client: ClientGrpc;
