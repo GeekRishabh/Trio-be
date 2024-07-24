@@ -61,11 +61,60 @@ export class TasksService {
   }
 
   /**
-   * Retrieves all tasks.
-   * @returns An array of tasks.
+   * Retrieves all tasks with pagination, sorting, filtering, and searching options.
+   * @param page - The page number to retrieve.
+   * @param limit - The number of tasks per page.
+   * @param sort - The field to sort by. Defaults to 'createdAt:DESC' if not provided.
+   * @param filter - The filter criteria in 'key:value' format.
+   * @param search - The search term for task title or description.
+   * @returns A promise resolving to an array of tasks.
    */
-  async findAll(): Promise<Task[]> {
-    return this.taskRepository.find();
+  async findAll(
+    page: number,
+    limit: number,
+    sort?: string,
+    filter?: string,
+    search?: string,
+  ): Promise<Task[]> {
+    // Calculate the offset for pagination
+    const offset = (page - 1) * limit;
+
+    // Create a query builder to construct the query
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+    // Apply search criteria if provided
+    if (search) {
+      queryBuilder.where(
+        'task.title LIKE :search OR task.description LIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+
+    // Apply filter criteria if provided
+    if (filter) {
+      // Assuming filter is a simple key-value pair like "status:active"
+      const [key, value] = filter.split(':');
+      queryBuilder.andWhere(`task.${key} = :value`, { value });
+    }
+
+    // Apply sorting
+    if (sort) {
+      // Assuming sort is in the format "field:direction" e.g., "createdAt:DESC"
+      const [field, direction] = sort.split(':');
+      queryBuilder.orderBy(
+        `task.${field}`,
+        direction.toUpperCase() as 'ASC' | 'DESC',
+      );
+    } else {
+      // Default sorting
+      queryBuilder.orderBy('task.createdAt', 'DESC');
+    }
+
+    // Apply pagination
+    queryBuilder.skip(offset).take(limit);
+
+    // Execute the query and return the results
+    return queryBuilder.getMany();
   }
 
   /**
