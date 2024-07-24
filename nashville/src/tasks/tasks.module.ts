@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
+import { TasksGateway } from './tasks.gateway';
 
 @Module({
     imports: [
@@ -18,7 +19,7 @@ import { TasksController } from './tasks.controller';
             }
         ])
     ],
-    providers: [TasksService],
+    providers: [TasksService, TasksGateway],
     controllers: [TasksController]
 })
 export class TasksModule {}
