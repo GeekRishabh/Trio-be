@@ -49,9 +49,9 @@ export class TasksController {
     async findAll(
         @Query('page') page: number = 1,
         @Query('limit') limit: number = 10,
-        @Query('sort') sort: string,
-        @Query('filter') filter: string,
-        @Query('search') search: string
+        @Query('sort') sort?: string,
+        @Query('filter') filter?: string,
+        @Query('search') search?: string
     ): Promise<{ data: Task[]; count: number }> {
         try {
             return await this.tasksService.findAll(page, limit, sort, filter, search);

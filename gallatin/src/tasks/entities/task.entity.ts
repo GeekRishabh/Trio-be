@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -12,7 +13,8 @@ export class Task {
   id: string;
 
   @Column({ type: 'uuid', nullable: true })
-  parentId: string | null;
+  @IsOptional()
+  parentId?: string | null;
 
   @Column({ type: 'varchar' })
   title: string;
