@@ -25,8 +25,8 @@ export class TasksController {
    * @returns An array of tasks.
    */
   @GrpcMethod('TaskService', 'FindAll')
-  findAll() {
-    return { tasks: this.tasksService.findAll() };
+  findAll(page: number, limit: number, sort?: string, filter?: string, search?: string) {
+    return { tasks: this.tasksService.findAll(page, limit, sort, filter, search) };
   }
 
   /**

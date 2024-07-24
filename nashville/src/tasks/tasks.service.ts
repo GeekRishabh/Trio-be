@@ -38,7 +38,7 @@ export class TasksService implements OnModuleInit {
      * @returns An array of tasks.
      */
     findAll(page: number, limit: number, sort?: string, filter?: string, search?: string) {
-        return this.taskService.findAll(sort, limit, filter, search);
+        return this.taskService.findAll(page, limit, sort, filter, search);
     }
 
     /**
