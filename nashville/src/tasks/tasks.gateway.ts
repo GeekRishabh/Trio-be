@@ -22,8 +22,9 @@ export class TasksGateway {
      * @returns The created task.
      */
     @SubscribeMessage('createTask')
-    async handleCreateTask(@MessageBody() createTaskDto: CreateTaskDto): Promise<Task> {
-        return this.tasksService.create(createTaskDto);
+    async handleCreateTask(@MessageBody() createTaskDto: CreateTaskDto): Promise<void> {
+        const task: Task = await this.tasksService.create(createTaskDto);
+        this.server.emit('taskCreated', task);
     }
 
     /**
@@ -34,8 +35,9 @@ export class TasksGateway {
     @SubscribeMessage('updateTask')
     async handleUpdateTask(
         @MessageBody() updateData: { id: string; updateTaskDto: UpdateTaskDto }
-    ): Promise<Task> {
-        return this.tasksService.update(updateData.id, updateData.updateTaskDto);
+    ): Promise<void> {
+        const task: Task = await this.tasksService.update(updateData.id, updateData.updateTaskDto);
+        this.server.emit('taskUpdated', task);
     }
 
     /**
@@ -45,6 +47,7 @@ export class TasksGateway {
      */
     @SubscribeMessage('deleteTask')
     async handleDeleteTask(@MessageBody() id: string): Promise<void> {
-        return this.tasksService.delete(id);
+        await this.tasksService.delete(id);
+        this.server.emit('taskDeleted', id);
     }
 }
